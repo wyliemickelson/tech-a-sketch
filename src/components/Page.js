@@ -1,8 +1,13 @@
 import React from 'react'
+import Menu from './Menu'
+import Canvas from './Canvas'
 
 const Page = () => {
   return (
-    <div>Page</div>
+    <>
+      <Menu />
+      <Canvas length={25}/>
+    </>
   )
 }
 
