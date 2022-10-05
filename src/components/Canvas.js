@@ -26,6 +26,18 @@ const Canvas = ({ length, brushColor, mouseDown, currentAction }) => {
     setGrid(newGrid);
   }
 
+  const paintBucket = (fillArea) => {
+    const newGrid = [...grid];
+    Object.keys(fillArea).forEach(index => newGrid[index] = brushColor);
+    setGrid(newGrid);
+  }
+
+  const eraseCell = (index) => {
+    const newGrid = [...grid];
+    newGrid[index] = 'white';
+    setGrid(newGrid);
+  }
+
   const shadeCell = (index) => {
     const currColor = grid[index];
     const shadedColor = tinycolor(currColor).darken(2.5).toString();
@@ -42,14 +54,43 @@ const Canvas = ({ length, brushColor, mouseDown, currentAction }) => {
     setGrid(newGrid);
   }
 
-  const actions = [paintCell, shadeCell, lightenCell];
+  const fillWithBucket = (startIndex) => {
+    const startColor = grid[startIndex];
+    const checked = {};
+    const fillArea = {};
+    checkCells(startIndex, startColor, fillArea, checked);
+
+    paintBucket(fillArea);
+  }
+
+  const checkCells = (currentIndex, startColor, fillArea, checked) => {
+    if (checked[currentIndex] === true || grid[currentIndex] !== startColor) {
+      return;
+    }
+
+    checked[currentIndex] = true;
+    fillArea[currentIndex] = true;
+
+    let leftIndex = currentIndex - 1;
+    let aboveIndex = currentIndex - length;
+    let rightIndex = currentIndex + 1;
+    let belowIndex = currentIndex + length;
+
+    const invalidLeft = leftIndex % length === length - 1;
+    const invalidRight = rightIndex % length === 0;
+
+    if (!invalidLeft) checkCells(leftIndex, startColor, fillArea, checked);
+    checkCells(aboveIndex, startColor, fillArea, checked);
+    if (!invalidRight) checkCells(rightIndex, startColor, fillArea, checked);
+    checkCells(belowIndex, startColor, fillArea, checked);
+  }
+
+  const actions = [paintCell, eraseCell, shadeCell, lightenCell, fillWithBucket];
   const action = actions[currentAction];
 
   return (
     <StyledCanvas length={length} SIZEPX={SIZEPX}>
       {grid.map((cellColor, index) => {
-        const gridPosCol = index % length;
-        const gridPosRow = Math.floor(index / length);
         return <Cell mouseDown={mouseDown} color={cellColor} brushColor={brushColor} gridPos={index} currentAction={action} />
       })}
     </StyledCanvas>

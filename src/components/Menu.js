@@ -1,4 +1,5 @@
 import React from 'react'
+import ToggleButton from './ToggleButton';
 
 const Menu = ({ brushColor, settings, setSettings }) => {
 
@@ -8,14 +9,19 @@ const Menu = ({ brushColor, settings, setSettings }) => {
   }
 
   const handleActionChange = (actionIndex) => {
-    const newAction = settings.currentAction === 2 ? 0 : settings.currentAction + 1;
-    setSettings({...settings, currentAction: newAction});
+    setSettings({...settings, currentAction: actionIndex});
   }
 
   return (
     <>
-      <input type='color' value={brushColor} onChange={handleColorChange} />
-      <button onClick={handleActionChange}>Change</button>
+      <div>
+        <input type='color' value={brushColor} onChange={handleColorChange} />
+        <p>Brush Color </p>
+      </div>
+      {settings.actions.map((action, index) => {
+        const isCurrentAction = index === settings.currentAction;
+        return <ToggleButton text={action} active={isCurrentAction} actionIndex={index} handleActionChange={handleActionChange} key={action} />
+      })}
     </>
   )
 }
